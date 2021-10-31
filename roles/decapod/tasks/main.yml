@@ -2,21 +2,33 @@
 - name: set facts for prepare role
   set_fact:
     argo_version: "{{ argo_version }}"
-    argo_workflow_controller_image_repo: "{{ argo_workflow_controller_image_repo }}"
-    argo_workflow_executor_image_repo: "{{ argo_workflow_executor_image_repo }}"
-    argo_server_image_repo: "{{ argo_server_image_repo }}"
-    argo_mysql_image_repo: "{{ argo_mysql_image_repo }}"
-    argo_mysql_version: "{{ argo_mysql_version }}"
-    argocd_image_repo: "{{ argocd_image_repo }}"
     argocd_version: "{{ argocd_version }}"
-    argocd_dex_image_repo: "{{ argocd_dex_image_repo }}"
+    argocd_image_repo: "{{ argocd_image_repo }}"
     argocd_dex_version: "{{ argocd_dex_version }}"
-    argocd_redis_image_repo: "{{ argocd_redis_image_repo }}"
+    argocd_dex_image_repo: "{{ argocd_dex_image_repo }}"
     argocd_redis_version: "{{ argocd_redis_version }}"
+    argocd_redis_image_repo: "{{ argocd_redis_image_repo }}"
+    argocd_redis_exporter_version: "{{ argocd_redis_exporter_version }}"
+    argocd_redis_exporter_image_repo: "{{ argocd_redis_exporter_image_repo }}"
   tags: download
 
 - import_tasks: argo.yml
 - import_tasks: argocd.yml
+
+- name: check if decapod_bootstrap directory exists
+  stat:
+    path: "{{ decapod_bootstrap_dest }}"
+  register: stat_decapod_bootstrap_dest
+  tags: download
+
+- name: git clone decapod_bootstrap
+  git:
+    repo: "{{ decapod_bootstrap_source }}"
+    dest: "{{ decapod_bootstrap_dest }}"
+    version: "{{ decapod_bootstrap_version }}"
+  when: not stat_decapod_bootstrap_dest.stat.exists
+  become: false
+  tags: download
 
 - name: check if decapod_flow directory exists
   stat:

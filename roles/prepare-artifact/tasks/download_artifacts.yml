@@ -35,7 +35,7 @@
   become: no
   ignore_errors: yes
 
-- name: Download helm chart
+- name: Download helm charts from decapod-manifests
   script: >-
     {{ playbook_dir | dirname }}/scripts/download_helm_charts.py
     {{ inventory_dir }}/{{ item }}-manifest.yaml
@@ -46,7 +46,7 @@
     - taco_apps and taco_apps|length > 0
   with_items: "{{ taco_apps }}"
 
-- name: Download container image
+- name: Download container images from decapod-manifests
   script: >-
     {{ playbook_dir | dirname }}/scripts/download_container_images.py
     {{ inventory_dir }}/{{ item }}-manifest.yaml
@@ -57,7 +57,7 @@
     - taco_apps and taco_apps|length > 0
   with_items: "{{ taco_apps }}"
 
-- name: Download container image for rook, argo and argocd
+- name: Download container image for rook, argocd
   docker_image:
     name: "{{ item.repo }}"
     tag: "{{ item.tag }}"
@@ -74,13 +74,10 @@
     - { repo: "{{ argocd_image_repo }}", tag: "{{ argocd_version }}" }
     - { repo: "{{ argocd_dex_image_repo }}", tag: "{{ argocd_dex_version }}" }
     - { repo: "{{ argocd_redis_image_repo }}", tag: "{{ argocd_redis_version }}" }
-    - { repo: "{{ argo_workflow_controller_image_repo }}", tag: "{{ argo_version }}" }
-    - { repo: "{{ argo_workflow_executor_image_repo }}", tag: "{{ argo_version }}" }
-    - { repo: "{{ argo_server_image_repo }}",  tag: "{{ argo_version }}" }
-    - { repo: "{{ argo_mysql_image_repo }}", tag: "{{ argo_mysql_version }}" }
+    - { repo: "{{ argocd_redis_exporter_image_repo }}", tag: "{{ argocd_redis_exporter_version }}" }
   become: true
 
-- name: Download container images
+- name: Download containers that are used implicitly
   docker_image:
     name: "{{ item.repo }}"
     tag: "{{ item.tag }}"
